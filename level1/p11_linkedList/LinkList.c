@@ -69,7 +69,7 @@ void Insert_LinkList(LinkList* list, int pos, int data)
     pcur->next = newnode;
     list->size++;
 }
-//删除指定位置的值
+//删除指定位置的结点
 void RemoveByPos_LinkList(LinkList* list, int pos)
 {
     if (list == NULL)
@@ -82,18 +82,18 @@ void RemoveByPos_LinkList(LinkList* list, int pos)
     }
     LinkNode* pcur = list->head;
     //查找待删除节点的前一个节点；
-    for (int i = 0; i < pos; i++)
+    for (int i = 0; i < pos-1; i++)
     {
         pcur = pcur->next;
     }
 
-    pcur->next = pcur->next->next;
+    /*pcur->next = pcur->next->next;*/
     //    //缓存待删除节点
-    //linknode* del = pcur->next;
+    LinkNode* del = pcur->next;
 
-    //pcur->next = del->next;
-    ////释放
-    //free(del);
+    pcur->next = del->next;
+    //释放
+    free(del);
 
     list->size--;
 }
@@ -133,13 +133,13 @@ int  Front_LinkList(LinkList* list)
 }
 
 //打印链表各节点的值
-void Print_LinkList(LinkList* list)
+void Print_LinkList(LinkNode* head)
 {
-    if (list == NULL)
+    if (head->next == NULL)
     {
         printf("空\n");
     }
-    LinkNode* pcur = list->head->next;
+    LinkNode* pcur = head->next;
     while (pcur != NULL)
     {
         printf("%d ",pcur->value);
@@ -171,20 +171,33 @@ void FreeSpace_LinkList(LinkList* list)
 
 LinkNode* Reverse(LinkNode* head)//将该链表所有节点反序 
 {
-    LinkNode* p, * q, * r;
-    p = head;
-    q = p->next;
-    while (q != NULL) 
+    LinkNode* pre, *cur, * tmp;//tmp记录当前结点的下一个结点
+    pre = NULL;
+    tmp = NULL;
+    cur = head->next;
+    if (cur == NULL)
     {
-        r = q->next;
-        q->next = p;
-        p = q;
-        q = r;
+        printf("空链表，不需要逆序\n");
+        return head;
     }
-    head->next = NULL;
-    head = p;
-    return head;
-    
+    if (head->next->next == NULL)
+    {
+        printf("链表只有一个元素，不需要逆序\n");
+        return head;
+    }
+   
+    while (cur != NULL)
+    {
+       //记录当前结点的后一结点
+        tmp = cur->next;
+        //把pre赋值給next
+        cur->next = pre;
+        // pre cur 后移
+        pre = cur;
+        cur = tmp;
+    }
+    return pre;
+
 }
 
 
@@ -196,21 +209,27 @@ int main()
     Insert_LinkList(list, 1, 5);
     Insert_LinkList(list, 2, 6);
     Insert_LinkList(list, 3, 7);
-    Insert_LinkList(list, 5, 9);
     Insert_LinkList(list, 4, 8);
+    Insert_LinkList(list, 5, 9);
     Insert_LinkList(list, 6, 10);
     
-    Print_LinkList(list);
-    printf("\n");
-    printf("--------------\n");
+    Print_LinkList(list->head);
+    printf("反序前：\n");
+    printf("值为5的数据位置是 ");
     printf("%d\n",Find_LinkList(list, 5));
 
-    list = Reverse(list->head);
-    printf("反序后\n");
-    Print_LinkList(list);
+    /*RemoveByPos_LinkList(list, 1);
+    Print_LinkList(list->head);*/
+
+
+    LinkList* list2 = Init_LinkList();
+    list2->head->next = Reverse(list->head);
+    printf("反序后:\n");
+    Print_LinkList(list2->head);
     printf("\n");
-    printf("--------------\n");
-    printf("%d", Find_LinkList(list, 5));
+
+    printf("值为5的数据位置是 ");
+    printf("%d\n", Find_LinkList(list2, 5));
 
     FreeSpace_LinkList(list);
     //printf("hello world!\n");
